@@ -82,7 +82,9 @@ func TestGetDocument(t *testing.T) {
 		w := httptest.NewRecorder()
 		ctx, _ := gin.CreateTestContext(w)
 
-		ctx.Params = gin.Params{{Key: "document", Value: "123"}}
+		ctx.Params = gin.Params{
+			gin.Param{Key: "document", Value: "123"},
+		}
 		ctx.Request = httptest.NewRequest("GET", "/documents/123", nil)
 
 		handler.GetDocument(server)(ctx)
@@ -104,7 +106,10 @@ func TestGetDocument(t *testing.T) {
 		w := httptest.NewRecorder()
 		ctx, _ := gin.CreateTestContext(w)
 
-		ctx.Params = gin.Params{{Key: "document", Value: "18627977062"}}
+		ctx.Params = gin.Params{
+			gin.Param{Key: "document", Value: "18627977062"},
+		}
+
 		ctx.Request = httptest.NewRequest("GET", "/documents/18627977062", nil)
 
 		handler.GetDocument(server)(ctx)
@@ -133,7 +138,9 @@ func TestPatchDocument(t *testing.T) {
 		ctx, _ := gin.CreateTestContext(w)
 		ctx.Request = httptest.NewRequest("PATCH", "/documents/10", bytes.NewBufferString(body))
 		ctx.Request.Header.Set("Content-Type", "application/json")
-		ctx.Params = gin.Params{{Key: "id", Value: "10"}}
+		ctx.Params = gin.Params{
+			gin.Param{Key: "id", Value: "10"},
+		}
 
 		handler.PatchDocument(server)(ctx)
 
@@ -171,7 +178,9 @@ func TestPatchDocument(t *testing.T) {
 		ctx, _ := gin.CreateTestContext(w)
 		ctx.Request = httptest.NewRequest("PATCH", "/documents/10", bytes.NewBufferString(body))
 		ctx.Request.Header.Set("Content-Type", "application/json")
-		ctx.Params = gin.Params{{Key: "id", Value: "10"}}
+		ctx.Params = gin.Params{
+			gin.Param{Key: "id", Value: "10"},
+		}
 
 		handler.PatchDocument(server)(ctx)
 
@@ -191,7 +200,9 @@ func TestPatchDocument(t *testing.T) {
 		ctx, _ := gin.CreateTestContext(w)
 		ctx.Request = httptest.NewRequest("PATCH", "/documents/10", bytes.NewBufferString(body))
 		ctx.Request.Header.Set("Content-Type", "application/json")
-		ctx.Params = gin.Params{{Key: "id", Value: "10"}}
+		ctx.Params = gin.Params{
+			gin.Param{Key: "id", Value: "10"},
+		}
 
 		handler.PatchDocument(server)(ctx)
 
@@ -215,7 +226,9 @@ func TestPatchDocument(t *testing.T) {
 
 		ctx.Request = httptest.NewRequest("PATCH", "/documents/10", bytes.NewBufferString(body))
 		ctx.Request.Header.Set("Content-Type", "application/json")
-		ctx.Params = gin.Params{{Key: "id", Value: "10"}}
+		ctx.Params = gin.Params{
+			gin.Param{Key: "id", Value: "10"},
+		}
 
 		handler.PatchDocument(server)(ctx)
 
@@ -252,7 +265,9 @@ func TestDeleteDocument(t *testing.T) {
 		w := httptest.NewRecorder()
 		ctx, _ := gin.CreateTestContext(w)
 
-		ctx.Params = gin.Params{{Key: "id", Value: "15"}}
+		ctx.Params = gin.Params{
+			gin.Param{Key: "id", Value: "15"},
+		}
 		ctx.Request = httptest.NewRequest("DELETE", "/documents/15", nil)
 
 		handler.DeleteDocument(server)(ctx)
@@ -271,7 +286,9 @@ func TestDeleteDocument(t *testing.T) {
 
 		w := httptest.NewRecorder()
 		ctx, _ := gin.CreateTestContext(w)
-		ctx.Params = gin.Params{{Key: "id", Value: "15"}}
+		ctx.Params = gin.Params{
+			gin.Param{Key: "id", Value: "15"},
+		}
 		ctx.Request = httptest.NewRequest("DELETE", "/documents/15", nil)
 
 		handler.DeleteDocument(server)(ctx)
@@ -336,7 +353,9 @@ func TestPatchDocumentBlocklist_Success(t *testing.T) {
 	body := `{"blocked":true}`
 	w := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(w)
-	ctx.Params = gin.Params{{Key: "id", Value: "21"}}
+	ctx.Params = gin.Params{
+		gin.Param{Key: "id", Value: "21"},
+	}
 	ctx.Request = httptest.NewRequest("PATCH", "/documents/21/blocklist", bytes.NewBufferString(body))
 	ctx.Request.Header.Set("Content-Type", "application/json")
 

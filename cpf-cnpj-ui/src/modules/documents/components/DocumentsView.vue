@@ -2,11 +2,9 @@
   <div class="container mt-4">
     <h1 class="mb-4">Documentos</h1>
 
-    <!-- Alerts -->
     <BaseAlert :message="successMessage" type="success" />
     <BaseAlert :message="errorMessage" type="error" />
 
-    <!-- Criar documento -->
     <form @submit.prevent="create">
       <div class="input-group mb-3">
         <input
@@ -19,7 +17,6 @@
       </div>
     </form>
 
-    <!-- Tabela de documentos -->
     <table class="table table-bordered mt-4">
       <thead>
         <tr>
