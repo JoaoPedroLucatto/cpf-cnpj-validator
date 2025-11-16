@@ -21,6 +21,7 @@ func PostDocument(server *Server) gin.HandlerFunc {
 
 		if err := ctx.ShouldBindJSON(&input); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
 			return
 		}
 
@@ -29,13 +30,23 @@ func PostDocument(server *Server) gin.HandlerFunc {
 			return
 		}
 
-		documentCreated, _, err := server.Usecase.CreateDocument(documentValid)
+		documentCreated, existed, err := server.Usecase.CreateDocument(documentValid)
 		if err != nil {
 			server.Log.Error().Err(err).Msg("failed to create document")
 			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"error":   "failed to create document",
 				"details": err.Error(),
 			})
+
+			return
+		}
+
+		if existed {
+			server.Log.Error().Err(err).Msg("documento existed")
+			ctx.JSON(http.StatusConflict, gin.H{
+				"message": "documento existed",
+			})
+
 			return
 		}
 
@@ -157,7 +168,14 @@ func GetDocuments(server *Server) gin.HandlerFunc {
 		sortBy := ctx.DefaultQuery("sortBy", "created_at")
 		order := ctx.DefaultQuery("order", "asc")
 
-		documentList, err := server.Usecase.ListDocuments(document, docType, sortBy, order)
+		var documentNumber string
+
+		if document != "" {
+			documentClean, _ := validateDocument(ctx, server, document)
+			documentNumber = documentClean.Number
+		}
+
+		documentList, err := server.Usecase.ListDocuments(documentNumber, docType, sortBy, order)
 		if err != nil {
 			server.Log.Error().Err(err).Msg("failed to get document")
 			ctx.JSON(http.StatusInternalServerError, gin.H{

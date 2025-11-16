@@ -26,7 +26,7 @@ const props = defineProps({
 const typeClass = computed(() =>
   ({
     success: "alert-success",
-    danger: "alert-danger",
+    error: "alert-danger",
     warning: "alert-warning",
     info: "alert-info",
   }[props.type])

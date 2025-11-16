@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const token = "437b89a7eb8b3ef111f448069eb55923";
+const token = import.meta.env.VITE_API_KEY;
 
 const api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: import.meta.env.VITE_API_HOST,
   timeout: 8000,
 });
 

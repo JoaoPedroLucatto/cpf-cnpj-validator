@@ -6,41 +6,30 @@ import (
 	"strings"
 
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 func (db *Postgres) CreateDocument(document *entity.Document) (*entity.Document, bool, error) {
-	result := db.DB.
-		Clauses(
-			clause.OnConflict{
-				Columns:   []clause.Column{{Name: "number"}},
-				DoNothing: true,
-			},
-		).
-		Create(&document)
+	var existing entity.Document
 
-	if result.Error != nil {
-		return nil, false, result.Error
-	}
-
-	existed := result.RowsAffected == 0
-	if existed {
-
-		var existing entity.Document
-
-		err := db.DB.Unscoped().Where("number = ?", document.Number).First(&existing).Error
-		if err != nil {
-			return nil, true, err
-		}
-
+	err := db.DB.Unscoped().Where("number = ?", document.Number).First(&existing).Error
+	if err == nil {
 		if existing.DeletedAt.Valid {
 			existing.DeletedAt = gorm.DeletedAt{}
 			if err := db.DB.Save(&existing).Error; err != nil {
-				return nil, true, err
+				return nil, false, err
 			}
+			return &existing, false, nil
 		}
 
 		return &existing, true, nil
+	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, false, err
+	}
+
+	if err := db.DB.Create(document).Error; err != nil {
+		return nil, false, err
 	}
 
 	return document, false, nil

@@ -1,8 +1,12 @@
-import api from "../../../shared/api";
+import api from "../../../shared/api.util";
 
-export async function getDocuments() {
-  const res = await api.get("/documents");
-
+export async function getDocuments(filters?: {
+  document?: string;
+  type?: string;
+  sortBy?: string;
+  order?: string;
+}) {
+  const res = await api.get("/documents", { params: filters });
   return res.data;
 }
 

@@ -5,8 +5,8 @@
     <BaseAlert :message="successMessage" type="success" />
     <BaseAlert :message="errorMessage" type="error" />
 
-    <form @submit.prevent="create">
-      <div class="input-group mb-3">
+    <form @submit.prevent="create" class="mb-3">
+      <div class="input-group">
         <input
           v-model="newDocument"
           type="text"
@@ -15,6 +15,20 @@
         />
         <button class="btn btn-primary" type="submit">Criar</button>
       </div>
+    </form>
+
+    <form @submit.prevent="load" class="mb-3 d-flex gap-2">
+      <input v-model="filterDocument" type="text" placeholder="Filtrar por documento" class="form-control" />
+      <input v-model="filterType" type="text" placeholder="Filtrar por tipo" class="form-control" />
+      <select v-model="sortBy" class="form-select">
+        <option value="created_at">Criado em</option>
+        <option value="number">Número</option>
+      </select>
+      <select v-model="order" class="form-select">
+        <option value="asc">Ascendente</option>
+        <option value="desc">Descendente</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Filtrar</button>
     </form>
 
     <table class="table table-bordered mt-4">
