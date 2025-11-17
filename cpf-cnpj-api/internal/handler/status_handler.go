@@ -12,17 +12,39 @@ type StatusResponse struct {
 	RequestsCount int    `json:"requestsCount"`
 }
 
-func Status(server *Server, startTime time.Time) gin.HandlerFunc {
+func Health(server *Server) gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
-		server.Log.Info().Msg("handler get status")
+		server.Log.Info().Msg("handler health alive")
+		ctx.Status(http.StatusOK)
+	})
+}
+
+func Metrics(server *Server, startTime time.Time) gin.HandlerFunc {
+	return gin.HandlerFunc(func(ctx *gin.Context) {
+		server.Log.Info().Msg("handler get metrics")
 
 		uptime := time.Since(startTime).String()
-		requests, _ := server.Usecase.Repository.CountRequests()
+		requests, _ := server.Usecase.CountRequests()
 
 		ctx.JSON(http.StatusOK, gin.H{"status": StatusResponse{
 			Uptime:        uptime,
 			RequestsCount: requests,
 		}})
 
+	})
+}
+
+func Ready(server *Server) gin.HandlerFunc {
+	return gin.HandlerFunc(func(ctx *gin.Context) {
+		server.Log.Info().Msg("handler health ready")
+
+		err := server.Usecase.PingDatabase()
+		if err != nil {
+			ctx.Status(http.StatusInternalServerError)
+
+			return
+		}
+
+		ctx.Status(http.StatusOK)
 	})
 }

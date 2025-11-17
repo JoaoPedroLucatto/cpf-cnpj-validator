@@ -1,0 +1,329 @@
+openapi: 3.1.0
+info:
+  title: CPF/CNPJ Validation API
+  version: 1.0.0
+  description: API para cadastro, consulta, listagem, atualização e bloqueio de documentos (CPF/CNPJ).
+
+servers:
+  - url: http://localhost:3000
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        type:
+          type: string
+          enum: [CPF, CNPJ]
+        blocked:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          nullable: true
+          format: date-time
+
+    DocumentInput:
+      type: object
+      required: [document]
+      properties:
+        document:
+          type: string
+
+    DocumentUpdateInput:
+      type: object
+      required: [document]
+      properties:
+        document:
+          type: string
+
+    BlocklistInput:
+      type: object
+      required: [blocked]
+      properties:
+        blocked:
+          type: boolean
+
+security:
+  - BearerAuth: []
+
+paths:
+
+  /:
+    get:
+      summary: Página inicial
+      responses:
+        200:
+          description: OK
+
+  /status/health:
+    get:
+      summary: Verifica saúde da API
+      description: Endpoint simples para verificar se a API está operacional.
+      tags:
+        - Status
+      responses:
+        200:
+          description: A API está saudável
+
+  /status/metrics:
+    get:
+      summary: Métricas da API
+      description: Retorna informações de uptime e número de requisições processadas.
+      tags:
+        - Status
+      responses:
+        200:
+          description: Métricas retornadas com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: object
+                    properties:
+                      Uptime:
+                        type: string
+                        example: "1h23m45s"
+                        description: Tempo em funcionamento da API
+                      RequestsCount:
+                        type: integer
+                        example: 1287
+                        description: Total de requisições processadas
+
+  /status/ready:
+    get:
+      tags:
+        - Status
+      summary: Verifica se a API está pronta
+      description: >
+        Retorna **200 OK** quando a API está pronta e consegue se comunicar com o banco de dados.
+        Retorna **500 Internal Server Error** quando a API não consegue acessar o banco.
+      responses:
+        200:
+          description: A API está pronta
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: "ready"
+        500:
+          description: A API não está pronta (erro ao conectar no banco)
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  error: "database unreachable"
+
+  /documents:
+    post:
+      tags:
+        - Documents
+      summary: Cadastra um documento
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentInput"
+      responses:
+        201:
+          description: Documento criado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document:
+                    $ref: "#/components/schemas/Document"
+        409:
+          description: Documento já existe
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+    get:
+      tags:
+        - Documents
+      summary: Lista documentos
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: document
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            default: created_at
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+      responses:
+        200:
+          description: Lista de documentos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  documents:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Document"
+
+  /documents/{document}:
+    get:
+      tags:
+        - Documents
+      summary: Retorna um documento específico
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: document
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Documento encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document:
+                    $ref: "#/components/schemas/Document"
+        404:
+          description: Documento não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /documents/{id}:
+    patch:
+      tags:
+        - Documents
+      summary: Atualiza um documento
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentUpdateInput"
+      responses:
+        202:
+          description: Documento atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document:
+                    $ref: "#/components/schemas/Document"
+
+    delete:
+      tags:
+        - Documents
+      summary: Deleta um documento
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        202:
+          description: Documento deletado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document:
+                    $ref: "#/components/schemas/Document"
+
+  /documents/{id}/blocklist:
+    patch:
+      tags:
+        - Documents
+      summary: Bloqueia ou desbloqueia um documento
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlocklistInput"
+      responses:
+        200:
+          description: Status do bloqueio atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  blocked:
+                    type: boolean

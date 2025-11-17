@@ -17,7 +17,6 @@ clean:
 logs:
 	$(compose) logs -f --tail=100
 
-
 lint_version_golang ?= v1.61.0
 .PHONY: lint-api
 lint-api:
@@ -28,5 +27,5 @@ lint-api:
 		golangci-lint run -c tools/.golang-ci.yaml --timeout 3m
 
 .PHONY: test
-test: build ##@development Runs the tests.
+test: build
 	$(compose) run --rm api go test ./tests/unit/...

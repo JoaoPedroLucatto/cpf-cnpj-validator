@@ -36,7 +36,7 @@ func TestStatusHandler(t *testing.T) {
 	}
 
 	start := time.Now().Add(-2 * time.Second)
-	handlerFn := handler.Status(server, start)
+	handlerFn := handler.Metrics(server, start)
 
 	req := httptest.NewRequest(http.MethodGet, "/status", nil)
 	w := httptest.NewRecorder()

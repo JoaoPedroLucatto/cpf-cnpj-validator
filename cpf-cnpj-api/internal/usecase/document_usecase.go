@@ -50,3 +50,16 @@ func (usecase *Usecase) ListDocuments(document, doctype, sortBy, order string) (
 func (usecase *Usecase) MarkDocumentBlocklist(id string, blocked bool) error {
 	return usecase.Repository.UpdateDocumentBlocklist(id, blocked)
 }
+
+func (usecase *Usecase) CountRequests() (int, error) {
+	count, err := usecase.Repository.CountRequests()
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (usecase *Usecase) PingDatabase() error {
+	return usecase.Repository.PingDatabase()
+}

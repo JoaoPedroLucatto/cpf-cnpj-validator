@@ -41,7 +41,14 @@ func (server *Server) Server() *gin.Engine {
 	router.Use(server.RequestCounterMiddleware())
 
 	router.GET("/", Home)
-	router.GET("/status", Status(server, server.StartTime))
+	router.Static("/docs", "./docs")
+
+	statusPaths := router.Group("status")
+	{
+		statusPaths.GET("/health", Health(server))
+		statusPaths.GET("/metrics", Metrics(server, server.StartTime))
+		statusPaths.GET("/ready", Ready(server))
+	}
 
 	router.Use(AuthMiddleware())
 
