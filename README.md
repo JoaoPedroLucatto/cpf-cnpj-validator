@@ -45,6 +45,9 @@ Precisa conter docker instalado na sua máquina.
 make build up logs
 ```
 
+- **API:** [http://localhost:3000](http://localhost:3000)  
+- **Interface (UI):** [http://localhost:5173](http://localhost:5173)
+
 Caso precise matar os containers e limpar o volume criado.
 
 ```bash
@@ -52,6 +55,12 @@ make clean
 ```
 
 ## 📚 Documentação da API
+
+### Autenticação
+
+A API utiliza **Bearer Token** para autenticação.  
+É necessário enviar o token no cabeçalho `Authorization` em todas as requisições protegidas:
+
 
 ### Cadastra um documento
 
