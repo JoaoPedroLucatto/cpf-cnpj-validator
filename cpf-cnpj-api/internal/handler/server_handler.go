@@ -25,7 +25,7 @@ type Server struct {
 
 func NewServer(ctx context.Context, log *zerolog.Logger, repository db.Repository) *Server {
 	return &Server{
-		Usecase:   usecase.NewUsecaseService(context.Background(), log, repository),
+		Usecase:   usecase.NewUsecaseService(ctx, log, repository),
 		Log:       log,
 		StartTime: time.Now(),
 	}
